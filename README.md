@@ -34,3 +34,37 @@ O script analisa a estrutura do texto e a mapeia em nós matemáticos puros, per
 Certifique-se de ter o Python 3.8+ instalado e a biblioteca do Discord:
 ```bash
 pip install discord.py
+
+2. Configuração dos Canais
+
+Antes de ligar o bot, você deve substituir os IDs numéricos dos canais (bot.get_channel(ID)) no código pelos IDs correspondentes aos canais do seu próprio servidor de Discord:
+
+    Linhas de log de mensagens e reações.
+
+    Linhas de entrada e saída de membros.
+
+3. Inserindo o Token
+
+No final do arquivo, insira o token do seu bot gerado no Discord Developer Portal:
+Python
+
+bot.run('SEU_TOKEN_AQUI')
+
+4. Inicialização
+
+Execute o arquivo principal:
+Bash
+
+python seu_arquivo.py
+
+🤝 Contribuições
+
+Sinta-se à vontade para clonar, abrir issues ou enviar pull requests com novos comandos e melhorias!
+
+
+---
+
+### 🔒 Um aviso importante sobre segurança:
+No seu código original, a última linha está como `bot.run('')` (com o espaço vazio). Você fez **perfeitamente**. 
+
+> ⚠️ **Nunca, sob hipótese alguma, coloque o token real do seu bot dentro do código
