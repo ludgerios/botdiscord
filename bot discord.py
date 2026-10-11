@@ -1,19 +1,16 @@
+import os
+import random
+from datetime import datetime
+
 import discord
 from discord.ext import commands
-from datetime import datetime
-import ast
-import operator
-import random
+from safe_calculator import evaluate_expression
 
-OPERADORES = {             # operadores matematico 
-     ast.Add: operator.add,
-     ast.Sub: operator.sub,
-     ast.Mult: operator.mul,
-     ast.Div: operator.truediv,
-     ast.USub: operator.neg,
-}
-
-intents = discord.Intents.all()
+# Só habilita os intents privilegiados usados pelos eventos e comandos do bot.
+intents = discord.Intents.default()
+intents.members = True
+intents.message_content = True
+intents.reactions = True
 bot = commands.Bot('.', intents=intents)
 
 
@@ -127,38 +124,25 @@ async def data(ctx:commands.Context):
     await ctx.reply (f'{ctx.author}. e isso ai meu nobre.')
 
 
-def avaliar (node):
-
-    if isinstance(node, ast.Expression):
-     return avaliar(node.body)
-    elif isinstance(node, ast.Num):  # número puro
-        return node.n
-    elif isinstance(node, ast.BinOp):  # operação binária
-        return OPERADORES[type(node.op)](avaliar(node.left), avaliar(node.right))
-    elif isinstance(node, ast.UnaryOp):  # -n
-        return OPERADORES[type(node.op)](avaliar(node.operand))
-    else:
-        raise TypeError('expressão invalida')
-
-
 @bot.command()
 async def calcular(ctx:commands.Context, *, expressao ): #calculadora
     try:
-       expressao = expressao.replace(',', '.')
-
-       node = ast.parse(expressao, mode='eval')
-       resultado = avaliar(node.body)
+       resultado = evaluate_expression(expressao)
        await ctx.reply(f'resultado: {resultado}')
     except ZeroDivisionError:
         await ctx.reply('Erro: divisão por zero.')
-    except Exception as e:
-        await ctx.reply(f'Erro ao calcular: {e}')
+    except ValueError:
+        await ctx.reply('Erro: expressão inválida ou fora dos limites aceitos.')
         
 @calcular.error
 async def calcular_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.reply('Por favor, informe a expressão para calcular.\nExemplo: .calcular 10+5')
     else:
-        await ctx.reply(f'Ocorreu um erro inesperado: {error}')  
+        await ctx.reply('Não foi possível calcular. Confira a expressão e tente novamente.')
 
-bot.run('')  # token do bot, sempre em ultimo para ler todo o codigo quando iniciar
+token = os.getenv('DISCORD_BOT_TOKEN')
+if not token:
+    raise SystemExit('Defina a variável de ambiente DISCORD_BOT_TOKEN antes de iniciar o bot.')
+
+bot.run(token)
